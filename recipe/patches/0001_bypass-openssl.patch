@@ -1,14 +1,14 @@
-From 88b87fe934158ab1a475cd0bcd80ee92c25a60da Mon Sep 17 00:00:00 2001
+From 938ddf4a81d8e21fd0fb4df460a221be4ecc024f Mon Sep 17 00:00:00 2001
 From: Lorenzo Pirritano <lpirritano@anaconda.com>
-Date: Tue, 16 Jan 2024 21:20:22 -0600
+Date: Tue, 16 Jan 2024 22:42:48 -0600
 Subject: [PATCH] bypass openssl
 
 ---
- setup.py | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ setup.py | 28 +++++-----------------------
+ 1 file changed, 5 insertions(+), 23 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 0248577..5f14d1f 100644
+index 0248577..00da8c4 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -225,12 +225,10 @@ class BuildExtCommand(build_ext):
@@ -24,7 +24,7 @@ index 0248577..5f14d1f 100644
      elif building_for_freebsd:
        module.define_macros.append(('_GNU_SOURCE', '1'))
        module.define_macros.append(('USE_FREEBSD_PROC', '1'))
-@@ -267,25 +265,8 @@ class BuildExtCommand(build_ext):
+@@ -267,28 +265,12 @@ class BuildExtCommand(build_ext):
      if self.dynamic_linking:
        module.libraries.append('yara')
      else:
@@ -50,8 +50,14 @@ index 0248577..5f14d1f 100644
 +      # bypass OpenSSL
 +      if building_for_windows:
          # OpenSSL is not available, but in Windows we can rely on Wincrypt.
-         module.define_macros.append(('HASH_MODULE', '1'))
-         module.define_macros.append(('HAVE_WINCRYPT_H', '1'))
+-        module.define_macros.append(('HASH_MODULE', '1'))
+-        module.define_macros.append(('HAVE_WINCRYPT_H', '1'))
++        pass
++        # module.define_macros.append(('HASH_MODULE', '1'))
++        # module.define_macros.append(('HAVE_WINCRYPT_H', '1'))
+       else:
+         # OpenSSL is not available, exclude hash.c, as it requires some hashing 
+         # functions.
 -- 
 2.39.1
 
