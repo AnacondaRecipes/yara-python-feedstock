@@ -18,10 +18,21 @@ requirements:
     - {{ compiler('c') }}
     - make               # [unix]
   host:
-    - pip
     - python
+    - setuptools
+    - pip
+    - wheel
   run:
     - python
+
+test:
+  # imports:
+  #   - yara
+  requires:
+    - pip
+  commands:
+    - pip check
+    # - python -c "import yara; yara.compile(source='rule dummy { condition: true }')"
 
 about:
   home: https://virustotal.github.io/yara
