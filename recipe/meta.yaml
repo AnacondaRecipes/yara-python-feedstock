@@ -30,8 +30,8 @@ requirements:
     - python
 
 test:
-  # imports:
-  #   - yara
+  imports:
+    - yara
   requires:
     - pip
   commands:
