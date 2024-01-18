@@ -1,17 +1,17 @@
-From 9960022692495ff717b5bc8d86632cc8e50a2349 Mon Sep 17 00:00:00 2001
+From c6f3122542080e9d69f697340cdf6e211a5dec2c Mon Sep 17 00:00:00 2001
 From: Lorenzo Pirritano <lpirritano@anaconda.com>
-Date: Tue, 16 Jan 2024 22:56:30 -0600
-Subject: [PATCH] bypass openssl and wincrypt
+Date: Thu, 18 Jan 2024 08:49:49 -0600
+Subject: [PATCH] bypass openssl
 
 ---
- setup.py | 31 +++----------------------------
- 1 file changed, 3 insertions(+), 28 deletions(-)
+ setup.py | 23 ++---------------------
+ 1 file changed, 2 insertions(+), 21 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 0248577..a122f1a 100644
+index 6ec02ff..191e5fa 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -225,12 +225,10 @@ class BuildExtCommand(build_ext):
+@@ -236,12 +236,10 @@ class BuildExtCommand(build_ext):
        module.define_macros.append(('_GNU_SOURCE', '1'))
        module.define_macros.append(('USE_MACH_PROC', '1'))
        module.extra_compile_args.append('-std=c99')
@@ -24,7 +24,7 @@ index 0248577..a122f1a 100644
      elif building_for_freebsd:
        module.define_macros.append(('_GNU_SOURCE', '1'))
        module.define_macros.append(('USE_FREEBSD_PROC', '1'))
-@@ -267,32 +265,9 @@ class BuildExtCommand(build_ext):
+@@ -278,25 +276,8 @@ class BuildExtCommand(build_ext):
      if self.dynamic_linking:
        module.libraries.append('yara')
      else:
@@ -40,26 +40,18 @@ index 0248577..a122f1a 100644
 -                       include_dirs=module.include_dirs + openssl_include_dirs,
 -                       libraries=module.libraries + openssl_libraries + ['dl', 'pthread', 'z'],
 -                       library_dirs=module.library_dirs + openssl_library_dirs)
--          ):
+-          or self.enable_openssl):
 -        module.define_macros.append(('HASH_MODULE', '1'))
 -        module.define_macros.append(('HAVE_LIBCRYPTO', '1'))
 -        module.libraries.extend(openssl_libraries)
 -        module.include_dirs.extend(openssl_include_dirs)
 -        module.library_dirs.extend(openssl_library_dirs)
 -      elif building_for_windows:
--        # OpenSSL is not available, but in Windows we can rely on Wincrypt.
--        module.define_macros.append(('HASH_MODULE', '1'))
--        module.define_macros.append(('HAVE_WINCRYPT_H', '1'))
--      else:
--        # OpenSSL is not available, exclude hash.c, as it requires some hashing 
--        # functions.
--        exclusions.append('yara/libyara/modules/hash/hash.c')
-+      # OpenSSL is not available, exclude hash.c, as it requires some hashing 
-+      # functions.
-+      exclusions.append('yara/libyara/modules/hash/hash.c')
- 
-       if self.enable_magic:
-         module.define_macros.append(('MAGIC_MODULE', '1'))
++      # bypass OpenSSL
++      if building_for_windows:
+         # OpenSSL is not available, but in Windows we can rely on Wincrypt for
+         # hashing functions.
+         module.define_macros.append(('HASH_MODULE', '1'))
 -- 
 2.39.1
 
