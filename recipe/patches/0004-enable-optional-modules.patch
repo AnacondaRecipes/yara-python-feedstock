@@ -1,0 +1,29 @@
+From 2a7138878eb9a4bb33d5ab6ecd4e4f746cfb7e38 Mon Sep 17 00:00:00 2001
+From: Lorenzo Pirritano <lpirritano@anaconda.com>
+Date: Thu, 18 Jan 2024 23:37:43 -0600
+Subject: [PATCH] enable optional modules
+
+---
+ setup.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index b8aba4d..6c8302f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -130,6 +130,12 @@ class BuildCommand(build):
+ 
+     build.finalize_options(self)
+ 
++    # set user_options, enable optional modules
++    building_for_windows = self.plat_name in ('win32','win-amd64')
++    self.enable_magic = not building_for_windows   # depends on magic (libmagic, no win)
++    self.enable_cuckoo = not building_for_windows  # module, depends on jansson (no jansson.lib for win)
++    self.enable_dex = True     # module
++    self.enable_macho = True   # module
+ 
+ 
+ class BuildExtCommand(build_ext):
+-- 
+2.39.1
+

@@ -1,10 +1,12 @@
 From 0030658cc7fbb857f2f5a5fbb180344094ff640f Mon Sep 17 00:00:00 2001
-From: "Lorenzo Pirritano" <lpirritano@anaconda.com>
-Date: Thu, 18 Jan 2024 08:00:53 +0200
-Subject: [PATCH] Partial patch: Fix Appveyor build (#236)
+From: "Victor M. Alvarez" <vmalvarez@virustotal.com>
+Date: Wed, 26 Apr 2023 09:41:53 +0200
+Subject: [PATCH] Fix Appveyor build (#236)
 
-This is a partial patch (#236) applied only to setup.py and not appveyor.yml
-because it is not included in the tarball
+setup.py includes a new --enable-openssl flag that forces the use of OpenSSL. This flag is mainly to be used in Appveyor, where the OpenSSL is installed. Users building yara-python in Windows with python setup.py build won't have features that depend on OpenSSL, but the build will be successful.
+
+[lpirritano@anaconda.com] this patch does not contain the changes to appveyor.yml because the file 
+is not in the tarball, and not needed for the build
 
 ---
  setup.py     | 25 +++++++++++++++++--------
