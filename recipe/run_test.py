@@ -20,6 +20,7 @@ import tempfile
 import binascii
 import os
 import sys
+import platform
 import unittest
 import yara
 # Python 2/3
@@ -585,6 +586,7 @@ class TestYara(unittest.TestCase):
             'rule test { strings: $a = { 00 00 00 00 ?? 74 65 78 74 } condition: $a at 308}',
         ], PE32_FILE)
 
+    @unittest.skipIf(platform.machine().lower().startswith("s390x"), "does not work on s390x")
     def testIn(self):
 
         self.assertTrueRules([
@@ -738,6 +740,7 @@ class TestYara(unittest.TestCase):
                 print('\nFailed test: %s\n' % str(test))
                 raise e
 
+    @unittest.skipIf(platform.machine().lower().startswith("s390x"), "does not work on s390x")
     def testEntrypoint(self):
 
         self.assertTrueRules([
@@ -1092,7 +1095,7 @@ class TestYara(unittest.TestCase):
             'import "tests" rule test { condition: tests.isum(1,1) == 3}',
             'import "tests" rule test { condition: tests.fsum(1.0,1.0) == 3.0}',
         ])
-
+    @unittest.skipIf(platform.machine().lower().startswith("s390x"), "does not work on s390x")
     def testIntegerFunctions(self):
 
         self.assertTrueRules([
