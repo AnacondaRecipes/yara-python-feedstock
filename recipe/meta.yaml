@@ -29,9 +29,7 @@ requirements:
     - setuptools
     - pip
     - wheel
-    # jansson 2.14 for win (win-64/jansson-2.14-h2bbff1b_0.tar.bz2) 
-    # has a jansson_d.lib and not jansson.lib, nor jansson.dll
-    - jansson        # [not win]
+    - jansson       
     # magic is not available for win
     - libmagic       # [not win]
   run:

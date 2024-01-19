@@ -18,7 +18,7 @@ index b8aba4d..6c8302f 100644
 +    # set user_options, enable optional modules
 +    building_for_windows = self.plat_name in ('win32','win-amd64')
 +    self.enable_magic = not building_for_windows   # depends on magic (libmagic, no win)
-+    self.enable_cuckoo = not building_for_windows  # module, depends on jansson (no jansson.lib for win)
++    self.enable_cuckoo = True  # module, depends on jansson
 +    self.enable_dex = True     # module
 +    self.enable_macho = True   # module
  

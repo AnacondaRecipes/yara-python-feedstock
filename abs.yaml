@@ -1,2 +1,5 @@
 upload-channels:
   - sfe1ed40
+
+channels:
+    - https://staging.continuum.io/prefect/fs/jansson-feedstock/pr2/8ef6aa7
