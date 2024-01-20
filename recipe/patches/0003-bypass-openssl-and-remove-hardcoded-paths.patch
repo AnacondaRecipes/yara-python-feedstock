@@ -1,0 +1,92 @@
+From e9588b51b568fbfcfe77669ca8a3604939d709f5 Mon Sep 17 00:00:00 2001
+From: Lorenzo Pirritano <lpirritano@anaconda.com>
+Date: Thu, 18 Jan 2024 23:21:20 -0600
+Subject: [PATCH 2/3] bypass openssl and remove hardcoded paths
+
+---
+ setup.py | 48 ++----------------------------------------------
+ 1 file changed, 2 insertions(+), 46 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 6ec02ff..b8aba4d 100644
+--- a/setup.py
++++ b/setup.py
+@@ -206,19 +206,6 @@ class BuildExtCommand(build_ext):
+ 
+     if building_for_windows:
+       arch = 'x86' if self.plat_name == 'win32' else 'x64'
+-      openssl_include_dirs = [
+-        os.path.join(base_dir, 'yara\\windows\\vs2015\\packages\\YARA.OpenSSL.{}.1.1.1\\include'.format(arch)),
+-        os.path.join(base_dir, 'yara\\windows\\vs2017\\packages\\YARA.OpenSSL.{}.1.1.1\\include'.format(arch))
+-      ]
+-      openssl_library_dirs = [
+-        os.path.join(base_dir, 'yara\\windows\\vs2015\\packages\\YARA.OpenSSL.{}.1.1.1\\lib'.format(arch)),
+-        os.path.join(base_dir, 'yara\\windows\\vs2017\\packages\\YARA.OpenSSL.{}.1.1.1\\lib'.format(arch))
+-      ]
+-      openssl_libraries = ['libcrypto']
+-    else:
+-      openssl_include_dirs = []
+-      openssl_library_dirs = []
+-      openssl_libraries = ['crypto']
+ 
+     if building_for_linux:
+       module.define_macros.append(('_GNU_SOURCE', '1'))
+@@ -236,27 +223,13 @@ class BuildExtCommand(build_ext):
+       module.define_macros.append(('_GNU_SOURCE', '1'))
+       module.define_macros.append(('USE_MACH_PROC', '1'))
+       module.extra_compile_args.append('-std=c99')
+-      module.include_dirs.append('/usr/local/opt/openssl/include')
+-      module.include_dirs.append('/opt/local/include')
+-      module.library_dirs.append('/opt/local/lib')
+-      module.include_dirs.append('/usr/local/include')
+-      module.library_dirs.append('/usr/local/lib')
+-      module.library_dirs.append('/usr/local/opt/openssl/lib')
+     elif building_for_freebsd:
+       module.define_macros.append(('_GNU_SOURCE', '1'))
+       module.define_macros.append(('USE_FREEBSD_PROC', '1'))
+-      module.include_dirs.append('/opt/local/include')
+-      module.library_dirs.append('/opt/local/lib')
+-      module.include_dirs.append('/usr/local/include')
+-      module.library_dirs.append('/usr/local/lib')
+     elif building_for_openbsd:
+       module.define_macros.append(('_GNU_SOURCE', '1'))
+       module.define_macros.append(('USE_OPENBSD_PROC', '1'))
+       module.extra_compile_args.append('-std=c99')
+-      module.include_dirs.append('/opt/local/include')
+-      module.library_dirs.append('/opt/local/lib')
+-      module.include_dirs.append('/usr/local/include')
+-      module.library_dirs.append('/usr/local/lib')
+     else:
+       module.define_macros.append(('_GNU_SOURCE', '1'))
+       module.define_macros.append(('USE_NO_PROC', '1'))
+@@ -278,25 +251,8 @@ class BuildExtCommand(build_ext):
+     if self.dynamic_linking:
+       module.libraries.append('yara')
+     else:
+-      # Is OpenSSL available?
+-      if (has_function('OpenSSL_add_all_algorithms',
+-                       includes=['openssl/evp.h'],
+-                       include_dirs=module.include_dirs + openssl_include_dirs,
+-                       libraries=module.libraries + openssl_libraries,
+-                       library_dirs=module.library_dirs + openssl_library_dirs)
+-          # In case OpenSSL is being linked statically
+-          or has_function('OpenSSL_add_all_algorithms',
+-                       includes=['openssl/evp.h'],
+-                       include_dirs=module.include_dirs + openssl_include_dirs,
+-                       libraries=module.libraries + openssl_libraries + ['dl', 'pthread', 'z'],
+-                       library_dirs=module.library_dirs + openssl_library_dirs)
+-          or self.enable_openssl):
+-        module.define_macros.append(('HASH_MODULE', '1'))
+-        module.define_macros.append(('HAVE_LIBCRYPTO', '1'))
+-        module.libraries.extend(openssl_libraries)
+-        module.include_dirs.extend(openssl_include_dirs)
+-        module.library_dirs.extend(openssl_library_dirs)
+-      elif building_for_windows:
++      # bypass OpenSSL
++      if building_for_windows:
+         # OpenSSL is not available, but in Windows we can rely on Wincrypt for
+         # hashing functions.
+         module.define_macros.append(('HASH_MODULE', '1'))
+-- 
+2.39.1
+
